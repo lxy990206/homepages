@@ -192,6 +192,19 @@
             grid-column: 1 / -1;
         }
     </style>
+	<style>
+        /* 新增视频卡片链接样式 */
+        .video-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s;
+        }
+
+        .video-link:hover .video-card {
+            transform: translateY(-5px);
+        }
+    </style>
 </head>
 </head>
 <body>
@@ -222,54 +235,73 @@
         <!-- 视频列表 -->
         <div class="video-list-container">
             <div class="recommendations" id="videoList">
-                <!-- 视频项 - 示例数据 -->
-                <a src="index.html"><div class="video-card">
-                    <div class="thumbnail-container">
-                        <img src="video1-thumb.jpg" alt="编程教程" class="thumbnail">
-                        <span class="video-duration">12:30</span>
-                    </div>
-                    <div class="video-content">
-                        <h3 class="video-title">JavaScript入门教程</h3>
-                        <div class="video-stats">
-                            <span>8千次播放</span>
-                            <span>3天前</span>
+                <!-- 修改后的视频项 - 添加链接 -->
+                <a href="index.html" class="video-link">
+                    <div class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="video1-thumb.jpg" alt="编程教程" class="thumbnail">
+                            <span class="video-duration">12:30</span>
+                        </div>
+                        <div class="video-content">
+                            <h3 class="video-title">JavaScript入门教程</h3>
+                            <div class="video-stats">
+                                <span>8千次播放</span>
+                                <span>3天前</span>
+                            </div>
                         </div>
                     </div>
-                </div></a>
+                </a>
 
-                <div class="video-card">
-                    <div class="thumbnail-container">
-                        <img src="video2-thumb.jpg" alt="摄影技巧" class="thumbnail">
-                        <span class="video-duration">18:45</span>
-                    </div>
-                    <div class="video-content">
-                        <h3 class="video-title">单反摄影进阶技巧</h3>
-                        <div class="video-stats">
-                            <span>1.5万次播放</span>
-                            <span>1周前</span>
+                <a href="play.html" class="video-link">
+                    <div class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="video2-thumb.jpg" alt="摄影技巧" class="thumbnail">
+                            <span class="video-duration">18:45</span>
+                        </div>
+                        <div class="video-content">
+                            <h3 class="video-title">单反摄影进阶技巧</h3>
+                            <div class="video-stats">
+                                <span>1.5万次播放</span>
+                                <span>1周前</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="video-card">
-                    <div class="thumbnail-container">
-                        <img src="video2-thumb.jpg" alt="摄影技巧" class="thumbnail">
-                        <span class="video-duration">18:45</span>
-                    </div>
-                    <div class="video-content">
-                        <h3 class="video-title">123</h3>
-                        <div class="video-stats">
-                            <span>1.5万次播放</span>
-                            <span>1周前</span>
+                <a href="play.html?v=3" class="video-link">
+                    <div class="video-card">
+                        <div class="thumbnail-container">
+                            <img src="video2-thumb.jpg" alt="摄影技巧" class="thumbnail">
+                            <span class="video-duration">18:45</span>
+                        </div>
+                        <div class="video-content">
+                            <h3 class="video-title">123</h3>
+                            <div class="video-stats">
+                                <span>1.5万次播放</span>
+                                <span>1周前</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
                 <!-- 更多视频项... -->
             </div>
         </div>
     </div>
 
+
     <script>
+	 // 修改后的搜索功能（调整选择器）
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const videoLinks = document.querySelectorAll('.video-link');
+            let hasResults = false;
+
+            videoLinks.forEach(link => {
+                const title = link.querySelector('.video-title').textContent.toLowerCase();
+                const isMatch = title.includes(searchTerm);
+                link.style.display = isMatch ? 'block' : 'none';
+                if(isMatch) hasResults = true;
+            });
         // 搜索功能实现
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
