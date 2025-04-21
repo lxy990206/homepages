@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放 - 我的网站</title>
+    <style>
+	 * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Banner 样式 */
+        .banner {
+            background-color: #1a365d;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* 导航栏样式 */
+        .nav-container {
+            background-color: #2c5282;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav li {
+            margin: 0 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #4299e1;
+            border-radius: 4px;
+        }
+
+        /* 新增视频播放相关样式 */
+        .video-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 比例 */
+            position: relative;
+            background: #000;
+        }
+
+        .video-player video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .video-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #1a202c;
+        }
+
+        .video-meta {
+            display: flex;
+            gap: 20px;
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .video-description {
+            line-height: 1.6;
+            color: #4a5568;
+        }
+
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+
+        .video-content {
+            padding: 15px;
+        }
+
+        .video-duration {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .video-player {
+                margin-top: 0;
+            }
+            
+            .video-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+	<style>
+        /* 新增搜索框样式 */
+        .search-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        /* 文件列表样式 */
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .file-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .file-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .file-icon {
+            font-size: 40px;
+            color: #2c5282;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .file-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #718096;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #718096;
+            padding: 40px;
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <header class="banner">
+        <h1>视频中心</h1>
+    </header>
+
+    <div class="nav-container">
+        <nav>
+            <ul>
+                <li><a href="#home">主页</a></li>
+                <li><a href="#video" class="active">视频</a></li>
+                <li><a href="#audio">音频</a></li>
+                <li><a href="#file">文件</a></li>
+                <li><a href="#cloud">云盘</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索文件...">
+        </div>
+        
+        <div class="file-list" id="fileList">
+            <!-- 示例文件数据 -->
+            <div class="file-card">
+                <div class="file-icon">📹</div>
+                <h3>项目演示视频.mp4</h3>
+                <div class="file-info">
+                    <div class="file-meta">
+                        <span>视频文件</span>
+                        <span>256 MB</span>
+                    </div>
+                    <div class="file-meta">
+                        <span>2024-03-15</span>
+                        <span>时长 12:30</span>
+                    </div>
+                </div>
+            </div>
+			<div class="file-card">
+                <div class="file-icon"><img src='https://ts1.tc.mm.bing.net/th/id/R-C.461a298e7e039fbe19503c95fe3504fa?rik=%2bQcQx45JlHiBrg&riu=http%3a%2f%2fwww.downxia.com%2fuploadfiles%2f2022%2f0610%2f20220610031657272.png&ehk=lBcCRQkX6kJTkLwOVjZdeuc7Tizti2JknWtvUwJKun4%3d'></div>
+                <h3>1234.jpg</h3>
+                <div class="file-info">
+                    <div class="file-meta">
+                        <span>视频文件</span>
+                        <span>256 MB</span>
+                    </div>
+                    <div class="file-meta">
+                        <span>2024-03-15</span>
+                        <span>时长 12:30</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 更多文件卡片... -->
+        </div>
+    </div>
+
+    <script>
+        // 文件数据
+        const files = [
+            { 
+                name: '项目演示视频.mp4',
+                type: '视频文件',
+                size: '256 MB',
+                date: '2024-03-15',
+                duration: '12:30',
+                icon: '📹'
+            },
+			{ 
+                name: '1234.jpg',
+                type: '视频文件',
+                size: '256 MB',
+                date: '2024-03-15',
+                duration: '12:30',
+                icon: '<img src='https://ts1.tc.mm.bing.net/th/id/R-C.461a298e7e039fbe19503c95fe3504fa?rik=%2bQcQx45JlHiBrg&riu=http%3a%2f%2fwww.downxia.com%2fuploadfiles%2f2022%2f0610%2f20220610031657272.png&ehk=lBcCRQkX6kJTkLwOVjZdeuc7Tizti2JknWtvUwJKun4%3d'>'
+            },
+            // 更多文件数据...
+        ];
+
+        // 初始化文件列表
+        function renderFiles(filteredFiles) {
+            const container = document.getElementById('fileList');
+            container.innerHTML = '';
+
+            if(filteredFiles.length === 0) {
+                container.innerHTML = '<div class="no-results">未找到匹配的文件</div>';
+                return;
+            }
+
+            filteredFiles.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                card.innerHTML = `
+                    <div class="file-icon">${file.icon}</div>
+                    <h3>${file.name}</h3>
+                    <div class="file-info">
+                        <div class="file-meta">
+                            <span>${file.type}</span>
+                            <span>${file.size}</span>
+                        </div>
+                        <div class="file-meta">
+                            <span>${file.date}</span>
+                            <span>${file.duration ? '时长 ' + file.duration : ''}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = files.filter(file => 
+                file.name.toLowerCase().includes(searchTerm) ||
+                file.type.toLowerCase().includes(searchTerm)
+            );
+            renderFiles(filtered);
+        });
+
+        // 初始渲染
+        renderFiles(files);
+    </script>
+</body>
+</html>
