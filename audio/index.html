@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐中心 - 我的网站</title>
+    <style>
+        /* 保留原有基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .banner {
+            background-color: #1a365d;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .nav-container {
+            background-color: #2c5282;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav li {
+            margin: 0 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #4299e1;
+            border-radius: 4px;
+        }
+
+        /* 新增音乐列表样式 */
+        .music-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .music-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .music-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #edf2f7;
+            transition: background 0.2s;
+        }
+
+        .music-item:hover {
+            background: #f8fafc;
+        }
+
+        .music-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            margin-right: 15px;
+        }
+
+        .music-info {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .music-title {
+            font-weight: 500;
+            color: #1a202c;
+        }
+
+        .music-artist {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .play-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .play-btn:hover {
+            opacity: 0.9;
+        }
+
+        .music-duration {
+            color: #718096;
+        }
+
+        /* 音频播放器样式 */
+        .global-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        #audioPlayer {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="banner">
+        <h1>音乐中心</h1>
+    </header>
+
+    <div class="nav-container">
+        <nav>
+            <ul>
+                <li><a href="#home">主页</a></li>
+                <li><a href="#video">视频</a></li>
+                <li><a href="#audio" class="active">音频</a></li>
+                <li><a href="#file">文件</a></li>
+                <li><a href="#cloud">云盘</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="music-container">
+        <!-- 搜索框 -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索歌曲、歌手...">
+        </div>
+
+        <!-- 音乐列表 -->
+        <div class="music-list" id="musicList">
+            <!-- 示例音乐项 -->
+            <div class="music-item">
+                <img src="cover1.jpg" class="music-cover" alt="专辑封面">
+                <div class="music-info">
+                    <div class="music-title">夏天的风</div>
+                    <div class="music-artist">周杰伦</div>
+                </div>
+                <div class="music-duration">03:45</div>
+                <div class="music-controls">
+                    <button class="play-btn" data-src="music1.mp3">播放</button>
+                </div>
+            </div>
+
+            <!-- 更多音乐项... -->
+        </div>
+    </div>
+
+    <!-- 全局播放器 -->
+    <div class="global-player" id="globalPlayer">
+        <audio id="audioPlayer" controls>
+            <source src="" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+    </div>
+
+    <script>
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.music-item');
+            
+            items.forEach(item => {
+                const title = item.querySelector('.music-title').textContent.toLowerCase();
+                const artist = item.querySelector('.music-artist').textContent.toLowerCase();
+                if (title.includes(searchTerm) || artist.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // 播放控制
+        let currentAudio = null;
+        document.querySelectorAll('.play-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const audioPlayer = document.getElementById('audioPlayer');
+                const src = this.dataset.src;
+                
+                if (currentAudio !== src) {
+                    audioPlayer.src = src;
+                    currentAudio = src;
+                    document.getElementById('globalPlayer').style.display = 'block';
+                    audioPlayer.play();
+                } else {
+                    if (audioPlayer.paused) {
+                        audioPlayer.play();
+                    } else {
+                        audioPlayer.pause();
+                    }
+                }
+                
+                // 更新按钮文本
+                this.textContent = audioPlayer.paused ? '播放' : '暂停';
+            });
+        });
+
+        // 播放器状态同步
+        document.getElementById('audioPlayer').addEventListener('play', () => {
+            document.querySelectorAll('.play-btn').forEach(btn => {
+                if (btn.dataset.src === currentAudio) {
+                    btn.textContent = '暂停';
+                }
+            });
+        });
+
+        document.getElementById('audioPlayer').addEventListener('pause', () => {
+            document.querySelectorAll('.play-btn').forEach(btn => {
+                if (btn.dataset.src === currentAudio) {
+                    btn.textContent = '播放';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
